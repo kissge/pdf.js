@@ -2718,14 +2718,19 @@ var PartialEvaluator = (function PartialEvaluatorClosure() {
 
   PartialEvaluator.buildFontPaths = function(font, glyphs, handler) {
     function buildPath(fontChar) {
-      if (font.renderer.hasBuiltPath(fontChar)) {
-        return;
+      try {
+        if (font.renderer.hasBuiltPath(fontChar)) {
+          return;
+        }
+        handler.send('commonobj', [
+          `${font.loadedName}_path_${fontChar}`,
+          'FontPath',
+          font.renderer.getPathJs(fontChar),
+        ]);
+      } catch (_) {
+        // Ignore illegal CFF here
+        font.fallbackToSystemFont();
       }
-      handler.send('commonobj', [
-        `${font.loadedName}_path_${fontChar}`,
-        'FontPath',
-        font.renderer.getPathJs(fontChar),
-      ]);
     }
 
     for (const glyph of glyphs) {
