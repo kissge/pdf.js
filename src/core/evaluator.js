@@ -1388,7 +1388,7 @@ var PartialEvaluator = (function PartialEvaluatorClosure() {
       var xobjs = null;
       var skipEmptyXObjs = Object.create(null);
 
-      var preprocessor = new EvaluatorPreprocessor(stream, xref, stateManager);
+      var preprocessor = new EvaluatorPreprocessor(stream, xref, stateManager, resources);
 
       var textState;
 
@@ -1407,6 +1407,8 @@ var PartialEvaluator = (function PartialEvaluatorClosure() {
           };
         }
         textContentItem.fontName = font.loadedName;
+
+        textContentItem.color = stateManager.state.fillColor;
 
         // 9.4.4 Text Space Details
         var tsm = [textState.fontSize * textState.textHScale, 0,
@@ -1487,6 +1489,7 @@ var PartialEvaluator = (function PartialEvaluatorClosure() {
           height: textChunk.height,
           transform: textChunk.transform,
           fontName: textChunk.fontName,
+          color: textChunk.color,
         };
       }
 
@@ -3085,7 +3088,7 @@ var EvaluatorPreprocessor = (function EvaluatorPreprocessorClosure() {
 
   const MAX_INVALID_PATH_OPS = 20;
 
-  function EvaluatorPreprocessor(stream, xref, stateManager) {
+  function EvaluatorPreprocessor(stream, xref, stateManager, resources) {
     this.opMap = getOPMap();
     // TODO(mduan): pass array of knownCommands rather than this.opMap
     // dictionary
@@ -3096,6 +3099,14 @@ var EvaluatorPreprocessor = (function EvaluatorPreprocessorClosure() {
     this.stateManager = stateManager;
     this.nonProcessedArgs = [];
     this._numInvalidPathOPS = 0;
+
+    this.resources = resources;
+    this.xref = xref;
+
+    // Initial color state
+    this.stateManager.state.textRenderingMode = TextRenderingMode.FILL;
+    this.stateManager.state.fillColorSpace = ColorSpace.singletons.gray;
+    this.stateManager.state.fillColor = [0, 0, 0];
   }
 
   EvaluatorPreprocessor.prototype = {
@@ -3217,6 +3228,24 @@ var EvaluatorPreprocessor = (function EvaluatorPreprocessorClosure() {
           break;
         case OPS.transform:
           this.stateManager.transform(args);
+          break;
+        case OPS.setFillColorSpace:
+          this.stateManager.state.fillColorSpace = ColorSpace.parse(args[0], this.xref, this.resources);
+          break;
+        case OPS.setFillColor:
+          this.stateManager.state.fillColor = state.fillColorSpace.getRgb(args, 0);
+          break;
+        case OPS.setFillGray:
+          this.stateManager.state.fillColorSpace = ColorSpace.singletons.gray;
+          this.stateManager.state.fillColor = ColorSpace.singletons.gray.getRgb(args, 0);
+          break;
+        case OPS.setFillCMYKColor:
+          this.stateManager.state.fillColorSpace = ColorSpace.singletons.cmyk;
+          this.stateManager.state.fillColor = ColorSpace.singletons.cmyk.getRgb(args, 0);
+          break;
+        case OPS.setFillRGBColor:
+          this.stateManager.state.fillColorSpace = ColorSpace.singletons.rgb;
+          this.stateManager.state.fillColor = ColorSpace.singletons.rgb.getRgb(args, 0);
           break;
       }
     },
