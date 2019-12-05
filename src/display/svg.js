@@ -1297,7 +1297,9 @@ SVGGraphics = class SVGGraphics {
           this.setFillAlpha(value);
           break;
         default:
-          warn(`Unimplemented graphic state operator ${key}`);
+          if (key !== 'BM' && key !== 'SMask') {
+            warn(`Unimplemented graphic state operator ${key}`);
+          }
           break;
       }
     }
