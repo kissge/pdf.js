@@ -782,6 +782,8 @@ SVGGraphics = class SVGGraphics {
       }
       current.xcoords.push(current.x + x * textHScale);
       current.tspan.textContent += character;
+      current.tspan.setAttributeNS(null, 'str',
+                                 (current.tspan.getAttributeNS(null, 'str') || '') + glyph.unicode);
       x += charWidth;
     }
     if (vertical) {
