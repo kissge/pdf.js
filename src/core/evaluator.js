@@ -993,7 +993,7 @@ var PartialEvaluator = (function PartialEvaluatorClosure() {
       var xobjs = (resources.get('XObject') || Dict.empty);
       var patterns = (resources.get('Pattern') || Dict.empty);
       var stateManager = new StateManager(initialState);
-      var preprocessor = new EvaluatorPreprocessor(stream, xref, stateManager);
+      var preprocessor = new EvaluatorPreprocessor(stream, xref, stateManager, this.pdfFunctionFactory);
       var timeSlotManager = new TimeSlotManager();
 
       function closePendingRestoreOPS(argument) {
@@ -1388,7 +1388,7 @@ var PartialEvaluator = (function PartialEvaluatorClosure() {
       var xobjs = null;
       var skipEmptyXObjs = Object.create(null);
 
-      var preprocessor = new EvaluatorPreprocessor(stream, xref, stateManager, resources);
+      var preprocessor = new EvaluatorPreprocessor(stream, xref, stateManager, resources, this.pdfFunctionFactory);
 
       var textState;
 
@@ -1409,6 +1409,7 @@ var PartialEvaluator = (function PartialEvaluatorClosure() {
         textContentItem.fontName = font.loadedName;
 
         textContentItem.color = stateManager.state.fillColor;
+        textContentItem.colorspace = stateManager.state.fillColorSpace;
 
         // 9.4.4 Text Space Details
         var tsm = [textState.fontSize * textState.textHScale, 0,
@@ -1490,6 +1491,7 @@ var PartialEvaluator = (function PartialEvaluatorClosure() {
           transform: textChunk.transform,
           fontName: textChunk.fontName,
           color: textChunk.color,
+          colorspace: textChunk.colorspace,
         };
       }
 
@@ -3088,7 +3090,7 @@ var EvaluatorPreprocessor = (function EvaluatorPreprocessorClosure() {
 
   const MAX_INVALID_PATH_OPS = 20;
 
-  function EvaluatorPreprocessor(stream, xref, stateManager, resources) {
+  function EvaluatorPreprocessor(stream, xref, stateManager, resources, pdfFunctionFactory) {
     this.opMap = getOPMap();
     // TODO(mduan): pass array of knownCommands rather than this.opMap
     // dictionary
@@ -3102,6 +3104,8 @@ var EvaluatorPreprocessor = (function EvaluatorPreprocessorClosure() {
 
     this.resources = resources;
     this.xref = xref;
+
+    this.pdfFunctionFactory = pdfFunctionFactory;
 
     // Initial color state
     this.stateManager.state.textRenderingMode = TextRenderingMode.FILL;
@@ -3230,10 +3234,11 @@ var EvaluatorPreprocessor = (function EvaluatorPreprocessorClosure() {
           this.stateManager.transform(args);
           break;
         case OPS.setFillColorSpace:
-          this.stateManager.state.fillColorSpace = ColorSpace.parse(args[0], this.xref, this.resources);
+        //   this.stateManager.state.fillColorSpace = ColorSpace.parse(args[0], this.xref, this.resources, this.pdfFunctionFactory);
           break;
         case OPS.setFillColor:
-          this.stateManager.state.fillColor = state.fillColorSpace.getRgb(args, 0);
+        //   this.stateManager.state.fillColor = state.fillColorSpace.getRgb(args, 0);
+        console.error('Warning: OPS.setFillColor!');
           break;
         case OPS.setFillGray:
           this.stateManager.state.fillColorSpace = ColorSpace.singletons.gray;
