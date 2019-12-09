@@ -136,7 +136,9 @@ class DOMCMapReaderFactory {
 
 class DOMSVGFactory {
   create(width, height) {
-    assert(width > 0 && height > 0, 'Invalid SVG dimensions');
+    // assert(width > 0 && height > 0, 'Invalid SVG dimensions');
+    width = Math.abs(width);
+    height = Math.abs(height);
 
     const svg = document.createElementNS(SVG_NS, 'svg:svg');
     svg.setAttribute('version', '1.1');
