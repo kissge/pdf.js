@@ -707,6 +707,7 @@ SVGGraphics = class SVGGraphics {
     current.xcoords = [];
     current.tspan = this.svgFactory.createElement('svg:tspan');
     current.tspan.setAttributeNS(null, 'font-family', current.fontFamily);
+    current.tspan.setAttributeNS(null, 'font-name', current.fontName);
     current.tspan.setAttributeNS(null, 'font-size',
                                  `${pf(current.fontSize)}px`);
     current.tspan.setAttributeNS(null, 'y', pf(-current.y));
@@ -736,6 +737,7 @@ SVGGraphics = class SVGGraphics {
     current.xcoords = [];
     current.tspan = this.svgFactory.createElement('svg:tspan');
     current.tspan.setAttributeNS(null, 'font-family', current.fontFamily);
+    current.tspan.setAttributeNS(null, 'font-name', current.fontName);
     current.tspan.setAttributeNS(null, 'font-size',
                                  `${pf(current.fontSize)}px`);
     current.tspan.setAttributeNS(null, 'y', pf(-current.y));
@@ -796,6 +798,7 @@ SVGGraphics = class SVGGraphics {
                                  current.xcoords.map(pf).join(' '));
     current.tspan.setAttributeNS(null, 'y', pf(-current.y));
     current.tspan.setAttributeNS(null, 'font-family', current.fontFamily);
+    current.tspan.setAttributeNS(null, 'font-name', current.fontName);
     current.tspan.setAttributeNS(null, 'font-size',
                                  `${pf(current.fontSize)}px`);
     if (current.fontStyle !== SVG_DEFAULTS.fontStyle) {
@@ -893,6 +896,7 @@ SVGGraphics = class SVGGraphics {
     }
     current.fontSize = size;
     current.fontFamily = fontObj.loadedName;
+    current.fontName = fontObj.name;
     current.fontWeight = bold;
     current.fontStyle = italic;
 
