@@ -1050,7 +1050,7 @@ SVGGraphics = class SVGGraphics {
     switch (args[0]) {
       case 'RadialAxial':
         const shadingId = `shading${shadingCount++}`;
-        const colorStops = args[2];
+        const colorStops = args[2] || [];
         let gradient;
 
         switch (args[1]) {
